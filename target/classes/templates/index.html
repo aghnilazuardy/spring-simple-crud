@@ -12,7 +12,7 @@
 <div class="container my-2" align="center">
 
 <h3>Employee List</h3>
-<a th:href="@{/add}" class="btn btn-primary btn-sm mb-3" >Add Employee</a>
+<a th:href="@{/signup}" class="btn btn-primary btn-sm mb-3" >Add Employee</a>
 	<table style="width:80%" border="1"
 		class = "table table-striped table-responsive-md">
 	<thead>
@@ -28,7 +28,7 @@
 		<td th:text="${employee.id}"></td>
 		<td th:text="${employee.name}"></td>
 		<td th:text="${employee.salary}"></td>
-		<td> <a th:href="@{/showFormForUpdate/{id}(id=${employee.id})}"
+		<td> <a th:href="@{/edit/{id}(id=${employee.id})}"
 				class="btn btn-primary">Update</a>
 	</td>
 </tr>

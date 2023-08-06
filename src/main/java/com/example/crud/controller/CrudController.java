@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 // import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.example.crud.model.Employee;
 import com.example.crud.repository.EmployeeRepository;
@@ -35,6 +38,21 @@ public class CrudController {
         return "index";
     }
 
+    @GetMapping("/signup")
+    public String showSignUpForm(Employee employee) {
+        return "add-user";
+    }
+
+    @PostMapping(value = "/add")
+    public String addUser(@Valid Employee employee, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "add-user";
+        }
+        
+        employeeService.saveEmployee(employee);
+        return "redirect:/index";
+    }
+
     @GetMapping("/view/all")
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
@@ -45,7 +63,7 @@ public class CrudController {
         return employeeRepository.findById(employeeId).orElseThrow();
     }
 
-    // @GetMapping("/view")
+    @GetMapping("/view/bonus")
     public Employee getAllEmployeesWithBonus() {
         List<Employee> employees = this.getAllEmployees();
         Employee result = new Employee();
@@ -59,15 +77,25 @@ public class CrudController {
         return result;
     }
 
-    @PostMapping("/add")
-    public Employee addEmployee(@Valid @RequestBody Employee employee) {
-        return employeeService.saveEmployee(employee);
+    @GetMapping("/edit/{id}")
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
+        Employee employee = employeeRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        
+        model.addAttribute("employee", employee);
+        return "update-user";
     }
 
-    @PostMapping("/edit/{id}")
-    public Employee editEmployee(@PathVariable(value = "id") Integer employeeId, @Valid @RequestBody Employee updatedData) {
+    @PostMapping("/update/{id}")
+    public Employee updateEmployee(@PathVariable(value = "id") Integer id, 
+        @Valid Employee updatedData, 
+        BindingResult result, Model model) {
+            if (result.hasErrors()) {
+                updatedData.setId(id);
+                // return "update-user";
+            }
 
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow();
+        Employee employee = employeeRepository.findById(id).orElseThrow();
 
         employee.setId(updatedData.getId());
         employee.setName(updatedData.getName());
