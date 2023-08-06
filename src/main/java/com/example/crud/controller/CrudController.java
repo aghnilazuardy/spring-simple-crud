@@ -32,17 +32,30 @@ public class CrudController {
         this.employeeService = employeeService;
     }
 
+    // show index page
     @GetMapping(value = "/index")
     public String showUserList(Model model) {        
         model.addAttribute("employees", employeeRepository.findAll());
         return "index";
     }
 
+    // add employee page
     @GetMapping("/signup")
     public String showSignUpForm(Employee employee) {
         return "add-user";
     }
 
+    // edit employee page
+    @GetMapping("/edit/{id}")
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
+        Employee employee = employeeRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        
+        model.addAttribute("employee", employee);
+        return "update-user";
+    }
+
+    // add employee service
     @PostMapping(value = "/add")
     public String addUser(@Valid Employee employee, BindingResult result, Model model) {
         if (result.hasErrors()) {
@@ -53,16 +66,19 @@ public class CrudController {
         return "redirect:/index";
     }
 
+    // api routes get all employee
     @GetMapping("/view/all")
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
+    // api routes get employee by id
     @GetMapping("/view/{id}")
     public Employee getEmployeeById(@PathVariable(value = "id") Integer employeeId) {
         return employeeRepository.findById(employeeId).orElseThrow();
     }
 
+    // api routes get all employee data with bonus
     @GetMapping("/view/bonus")
     public Employee getAllEmployeesWithBonus() {
         List<Employee> employees = this.getAllEmployees();
@@ -77,15 +93,7 @@ public class CrudController {
         return result;
     }
 
-    @GetMapping("/edit/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        Employee employee = employeeRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        
-        model.addAttribute("employee", employee);
-        return "update-user";
-    }
-
+    // api routes edit employee
     @PostMapping("/update/{id}")
     public Employee updateEmployee(@PathVariable(value = "id") Integer id, 
         @Valid Employee updatedData, 
