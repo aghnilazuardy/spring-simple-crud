@@ -11,9 +11,6 @@
 <body>
 <div class="container my-2" align="center">
 
-<div th:switch="${employees}">
-	<h2 th:case="null">No users yet!</h2>
-	<div th:case="*">
 <h3>Employee List</h3>
 <a th:href="@{/signup}" class="btn btn-primary btn-sm mb-3" >Add Employee</a>
 	<table border="1"
